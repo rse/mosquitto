@@ -21,10 +21,10 @@ way. The TypeScript/JavaScript API allows convenient configuration and
 run-time control of it.
 
 > [!NOTE]
-> Because the TypeScript/JavaScript API required Mosquitto itself,
-> it either requires you to have the `mosquitto` and `mosquitto_passwd`
-> commands in your `$PATH` or (the default) requires you to have the
-> `docker` command in your `$PATH`.
+> The TypeScript/JavaScript API requires Mosquitto itself, so this API
+> either requires you to have the `mosquitto` and `mosquitto_passwd`
+> commands in your `$PATH` or requires you to have the `docker` command
+> in your `$PATH` (the default).
 
 Installation
 ------------
