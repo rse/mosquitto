@@ -10,10 +10,15 @@ Mosquitto MQTT Broker Turnkey Solution
 About
 -----
 
-This is a Mosquitto Turnkey solution, i.e., the combination of
-an OCI Container and a corresponding TypeScript API for use with
-Node.js, for easily starting an instance of the MQTT broker [Eclipse
-Mosquitto](https://mosquitto.org/).
+This is a **Mosquitto** turnkey solution, i.e., the combination
+of an OCI Container `ghcr.io/rse/mosquitto` and a corresponding
+TypeScript/JavaScript API `mosquitto` for use with Node.js, for
+easily starting an instance of the excellent MQTT broker [Eclipse
+Mosquitto](https://mosquitto.org/). It was born from the need to have a
+Mosquitto instance available from within Node.js on the macOS and Linux
+platforms. The OCI container bundles the Mosquitto program in a portable
+way. The TypeScript/JavaScript API allows convenient configuration and
+run-time control of it.
 
 Installation
 ------------
