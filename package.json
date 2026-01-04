@@ -1,22 +1,22 @@
 {
     "name":                              "mosquitto",
     "version":                           "0.9.0",
-    "x-date":                            "2026-01-03",
+    "x-date":                            "2026-01-04",
     "type":                              "module",
     "description":                       "Mosquitto MQTT Broker Turnkey Solution",
     "keywords":                          [ "mqtt", "mosquitto", "broker" ],
     "license":                           "MIT",
     "repository": {
         "type":                          "git",
-        "url":                           "git+https://github.com/rse/mosquitto-turnkey.git"
+        "url":                           "git+https://github.com/rse/mosquitto.git"
     },
     "author": {
         "name":                          "Dr. Ralf S. Engelschall",
         "email":                         "rse@engelschall.com",
         "url":                           "http://engelschall.com"
     },
-    "homepage":                          "https://github.com/rse/mosquitto-turnkey",
-    "bugs":                              "https://github.com/rse/mosquitto-turnkey/issues",
+    "homepage":                          "https://github.com/rse/mosquitto",
+    "bugs":                              "https://github.com/rse/mosquitto/issues",
     "types":                             "./dst/mosquitto.d.ts",
     "module":                            "./dst/mosquitto.js",
     "main":                              "./dst/mosquitto.js",

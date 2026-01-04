@@ -1,5 +1,5 @@
 /*
-**  Mosquitto-Turnkey -- Mosquitto MQTT Broker Turnkey Solution
+**  Mosquitto -- Mosquitto MQTT Broker Turnkey Solution
 **  Copyright (c) 2026 Dr. Ralf S. Engelschall <rse@engelschall.com>
 **  Licensed under MIT license <https://spdx.org/licenses/MIT>
 */

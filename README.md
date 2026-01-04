@@ -1,6 +1,6 @@
 
-Mosquitto Turnkey
-=================
+Mosquitto
+=========
 
 Mosquitto MQTT Broker Turnkey Solution
 
@@ -10,23 +10,23 @@ Mosquitto MQTT Broker Turnkey Solution
 About
 -----
 
-**Mosquitto Turnkey** is the combination of an OCI Container
-and a corresponding TypeScript API for use with Node.js,
-for easily starting an instance of the MQTT broker
-[Eclipse Mosquitto](https://mosquitto.org/).
+This is a Mosquitto Turnkey solution, i.e., the combination of
+an OCI Container and a corresponding TypeScript API for use with
+Node.js, for easily starting an instance of the MQTT broker [Eclipse
+Mosquitto](https://mosquitto.org/).
 
 Installation
 ------------
 
 ```shell
-$ npm install mosquitto-turnkey
+$ npm install mosquitto
 ```
 
 Usage
 -----
 
 ```ts
-import Mosquitto from "mosquitto-turnkey"
+import Mosquitto from "mosquitto"
 import MQTT      from "mqtt"
 
 /*  start Mosquitto  */
