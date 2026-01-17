@@ -93,7 +93,8 @@
         "no-duplicate-imports":             "off",
         "no-await-in-loop":                 "off",
         "max-statements":                   "off",
-        "no-named-export":                  "off"
+        "no-named-export":                  "off",
+        "complexity":                       "off"
     }
 }
 
