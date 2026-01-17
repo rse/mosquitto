@@ -2,6 +2,12 @@
 CHANGES
 =======
 
+0.9.5 (2026-01-17)
+------------------
+
+- UPDATE: update container
+- UPDATE: update dependencies
+
 0.9.4 (2026-01-04)
 ------------------
 
