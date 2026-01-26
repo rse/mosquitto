@@ -83,6 +83,7 @@ export type MosquittoConfig = {
     container:    string
     auth:         "builtin" | "plugin"
     persistence:  boolean
+    acl:          string
     passwd:       MosquittoConfigPasswdEntry[]
     listen:       MosquittoConfigListenEntry[]
     custom:       string
@@ -97,6 +98,7 @@ The internal default is:
     container:    "ghcr.io/rse/mosquitto:<version>"
     auth:         "builtin",
     persistence:  false,
+    acl:          "",
     passwd:       [ { username: "example", password: "example" } ],
     listen:       [ { protocol: "mqtt", address: "127.0.0.1", port: 1883 } ],
     custom:       ""

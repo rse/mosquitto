@@ -33,6 +33,7 @@ export type MosquittoConfig = {
     container:    string
     auth:         "builtin" | "plugin"
     persistence:  boolean
+    acl:          string
     passwd:       MosquittoConfigPasswdEntry[]
     listen:       MosquittoConfigListenEntry[]
     custom:       string
@@ -52,6 +53,7 @@ export default class Mosquitto {
             native:       false,
             container:    "ghcr.io/rse/mosquitto:2.0.22-20260117",
             auth:         "builtin",
+            acl:          "",
             persistence:  false,
             passwd:       [ { username: "example", password: "example" } ],
             listen:       [ { protocol: "mqtt", address: "127.0.0.1", port: 1883 } ],
@@ -206,20 +208,25 @@ export default class Mosquitto {
 
         /*  generate Mosquitto ACL file  */
         const aclFile = path.join(tmpdir, "mosquitto-acl.txt")
-        let acl = textframe(`
-            #   shared/anonymous ACL list
-            topic   read       $SYS/#
-            pattern write      $SYS/broker/connection/%c/state
-            pattern read       peer/%c
-        `)
-        for (const entry of this.config.passwd) {
-            acl += textframe(`
-                #   user ACL list
-                user    ${entry.username}
-                topic   readwrite  ${entry.username}/#
-                topic   read       ${entry.username}/$share/#
-                topic   write      peer/#
+        let acl = ""
+        if (this.config.acl !== "")
+            acl = this.config.acl
+        else {
+            acl = textframe(`
+                #   shared/anonymous ACL list
+                topic   read       $SYS/#
+                pattern write      $SYS/broker/connection/%c/state
+                pattern read       peer/%c
             `)
+            for (const entry of this.config.passwd) {
+                acl += textframe(`
+                    #   user ACL list
+                    user    ${entry.username}
+                    topic   readwrite  ${entry.username}/#
+                    topic   read       ${entry.username}/$share/#
+                    topic   write      peer/#
+                `)
+            }
         }
         await fs.promises.writeFile(aclFile, acl, { encoding: "utf8", mode: 0o600 })
 
