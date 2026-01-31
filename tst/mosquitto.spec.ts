@@ -27,7 +27,6 @@ describe("Mosquitto Library", function () {
         /*  start Mosquitto  */
         const mosquitto = new Mosquitto()
         await mosquitto.start()
-        await new Promise((resolve) => { setTimeout(resolve, 1000) })
 
         /*  connect to Mosquitto  */
         const mqtt = MQTT.connect("mqtt://127.0.0.1:1883", {})

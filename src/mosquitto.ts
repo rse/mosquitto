@@ -318,6 +318,33 @@ export default class Mosquitto {
         this.process.stdout?.on("data", (data: string) => { this.output += data })
         this.process.stderr?.on("data", (data: string) => { this.output += data })
 
+        /*  wait until Mosquitto is running inside container  */
+        let timeout:  ReturnType<typeof setTimeout>  | null = null
+        let interval: ReturnType<typeof setInterval> | null = null
+        const cleanup = () => {
+             if (timeout  !== null) { clearTimeout(timeout);   timeout  = null }
+             if (interval !== null) { clearInterval(interval); interval = null }
+        }
+        await Promise.any([
+             /*  timeout handling  */
+             new Promise<void>((resolve, reject) => {
+                 timeout = setTimeout(() => {
+                     cleanup()
+                     reject(new Error("timeout starting Mosquitto"))
+                 }, 10 * 1000)
+             }),
+
+             /*  output handling  */
+             new Promise<void>((resolve, reject) => {
+                 interval = setInterval(() => {
+                     if (this.output.match(/mosquitto version [0-9.]+ running/s)) {
+                         cleanup()
+                         resolve()
+                     }
+                 }, 50)
+             })
+        ])
+
         /*  update state  */
         this.started = true
     }
