@@ -94,7 +94,8 @@
         "no-await-in-loop":                 "off",
         "max-statements":                   "off",
         "no-named-export":                  "off",
-        "complexity":                       "off"
+        "complexity":                       "off",
+        "prefer-await-to-then":             "off"
     }
 }
 
