@@ -2,6 +2,12 @@
 CHANGES
 =======
 
+1.0.0 (2026-02-01)
+------------------
+
+- IMPROVEMENT: on start(), really wait until Mosquitto is running inside container
+- UPDATE: update dependencies
+
 0.9.7 (2026-01-26)
 ------------------
 
