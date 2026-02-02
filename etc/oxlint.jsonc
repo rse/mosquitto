@@ -95,7 +95,8 @@
         "max-statements":                   "off",
         "no-named-export":                  "off",
         "complexity":                       "off",
-        "prefer-await-to-then":             "off"
+        "prefer-await-to-then":             "off",
+        "prefer-event-target":              "off"
     }
 }
 

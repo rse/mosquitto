@@ -8,6 +8,7 @@
 import fs                     from "node:fs"
 import path                   from "node:path"
 import os                     from "node:os"
+import { EventEmitter }       from "node:events"
 
 /*  external dependencies  */
 import { execa }              from "execa"
@@ -40,7 +41,7 @@ export type MosquittoConfig = {
 }
 
 /*  Mosquitto API class  */
-export default class Mosquitto {
+export default class Mosquitto extends EventEmitter {
     private config:  MosquittoConfig
     private tmpdir:  { path: string, cleanup: () => void } | null = null
     private started                                               = false
@@ -49,6 +50,7 @@ export default class Mosquitto {
 
     /*  construct API  */
     constructor (config: Partial<MosquittoConfig> = {}) {
+        super()
         this.config = {
             native:       false,
             container:    "ghcr.io/rse/mosquitto:2.0.22-20260117",
@@ -315,8 +317,14 @@ export default class Mosquitto {
         /*  capture outputs of the Mosquitto process  */
         this.process.stdout?.setEncoding("utf8")
         this.process.stderr?.setEncoding("utf8")
-        this.process.stdout?.on("data", (data: string) => { this.output += data })
-        this.process.stderr?.on("data", (data: string) => { this.output += data })
+        this.process.stdout?.on("data", (data: string) => {
+            this.emit("stdout", data)
+            this.output += data
+        })
+        this.process.stderr?.on("data", (data: string) => {
+            this.emit("stderr", data)
+            this.output += data
+        })
 
         /*  wait until Mosquitto is running inside container  */
         let timeout:  ReturnType<typeof setTimeout>  | null = null
