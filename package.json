@@ -28,41 +28,47 @@
     },
     "dependencies": {
         "execa":                         "9.6.1",
-        "which":                         "6.0.0",
+        "which":                         "6.0.1",
         "tmp":                           "0.2.5",
         "textframe":                     "1.2.1",
         "selfsigned":                    "5.5.0",
         "get-stream":                    "9.0.1"
     },
     "devDependencies": {
-        "eslint":                        "9.39.2",
-        "@eslint/js":                    "9.39.2",
-        "eslint-plugin-n":               "17.23.2",
+        "eslint":                        "10.0.0",
+        "@eslint/js":                    "10.0.1",
+        "eslint-plugin-n":               "17.24.0",
         "eslint-plugin-promise":         "7.2.1",
         "eslint-plugin-import":          "2.32.0",
         "eslint-plugin-mocha":           "11.2.0",
         "eslint-plugin-chai-expect":     "3.1.0",
         "neostandard":                   "0.12.2",
-        "globals":                       "17.2.0",
-        "oxlint":                        "1.42.0",
-        "eslint-plugin-oxlint":          "1.42.0",
+        "globals":                       "17.3.0",
+        "oxlint":                        "1.48.0",
+        "eslint-plugin-oxlint":          "1.48.0",
 
         "typescript":                    "5.9.3",
         "tsx":                           "4.21.0",
         "jiti":                          "2.6.1",
         "mocha":                         "11.7.5",
         "chai":                          "6.2.2",
-        "mqtt":                          "5.14.1",
+        "mqtt":                          "5.15.0",
 
         "@rse/stx":                      "1.1.4",
         "nodemon":                       "3.1.11",
         "shx":                           "0.4.0",
 
-        "@types/node":                   "25.1.0",
+        "@types/node":                   "25.2.3",
         "@types/chai":                   "5.2.3",
         "@types/mocha":                  "10.0.10",
         "@types/tmp":                    "0.2.6",
         "@types/which":                  "3.0.4"
+    },
+    "overrides": {
+        "eslint-plugin-promise":         { "eslint": ">=9.0.0" },
+        "eslint-plugin-import":          { "eslint": ">=9.0.0" },
+        "eslint-plugin-chai-expect":     { "eslint": ">=9.0.0" },
+        "neostandard":                   { "eslint": ">=9.0.0" }
     },
     "scripts": {
         "prepublishOnly":                "stx -c etc/stx.conf -v4 build",
