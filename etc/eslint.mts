@@ -6,7 +6,6 @@
 
 import pluginJs      from "@eslint/js"
 import pluginStd     from "neostandard"
-import pluginN       from "eslint-plugin-n"
 import pluginImport  from "eslint-plugin-import"
 import pluginPromise from "eslint-plugin-promise"
 import pluginMocha   from "eslint-plugin-mocha"
@@ -24,10 +23,15 @@ export default [
     ...pluginTS.configs.stylistic,
     ...pluginStd({
         ignores: pluginStd.resolveIgnoresFromGitignore()
+    }).map((cfg) => {
+        if (cfg.rules && "@stylistic/func-call-spacing" in cfg.rules) {
+            const { "@stylistic/func-call-spacing": _removed, ...rest } = cfg.rules
+            return { ...cfg, rules: rest }
+        }
+        return cfg
     }),
     {
         plugins: {
-            "n":       pluginN,
             "import":  pluginImport,
             "promise": pluginPromise
         },
@@ -54,6 +58,8 @@ export default [
             "no-labels":                                          "off",
             "no-useless-constructor":                             "off",
             "no-unused-vars":                                     "off",
+            "no-shadow":                                          "off",
+            "require-unicode-regexp":                             "off",
 
             "@stylistic/indent":                                  "off",
             "@stylistic/linebreak-style":                         [ "error", "unix" ],
@@ -85,6 +91,7 @@ export default [
             "@typescript-eslint/prefer-function-type":            "off",
             "@typescript-eslint/no-unnecessary-type-constraint":  "off",
             "@typescript-eslint/no-empty-object-type":            "off",
+            "@typescript-eslint/explicit-member-accessibility":   "off",
 
             "mocha/no-mocha-arrows":                              "off"
         }

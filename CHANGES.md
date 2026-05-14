@@ -8,6 +8,7 @@ CHANGES
 - FEATURE: add "customize" option for full config modification via callback
 - FEATURE: add debug usage and simple publish/subscribe test
 - UPDATE: upgrade to Mosquitto 2.1
+- UPDATE: update dependencies
 - CLEANUP: ignore ASE dotfile directory
 
 1.0.2 (2026-02-17)
