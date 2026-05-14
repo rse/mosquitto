@@ -231,7 +231,7 @@ export default class Mosquitto extends EventEmitter {
 
         /*  generate Mosquitto ACL file  */
         const aclFile = path.join(tmpdir, "mosquitto-acl.txt")
-        let acl = ""
+        let acl: string
         if (this.config.acl !== "")
             acl = this.config.acl
         else {
