@@ -5,20 +5,20 @@
 #   build arguments (early)
 ARG         IMAGE_PREFIX=ghcr.io/rse/
 ARG         IMAGE_NAME=mosquitto
-ARG         IMAGE_VERSION=2.0.22
-ARG         IMAGE_RELEASE=20260117
+ARG         IMAGE_VERSION=2.1.2
+ARG         IMAGE_RELEASE=20260514
 ARG         IMAGE_ALIAS=latest
 
 #   ==== STAGE 1 ====
 
 #   derive image from a certain base image
-FROM        golang:1.25.6-trixie AS stage1
+FROM        golang:1.26.3-trixie AS stage1
 
 #   add additional build tools
 RUN         apt-get update && \
             apt-get upgrade -y && \
             apt-get install -y curl binutils binutils-gold gcc g++ cmake make xsltproc git patch && \
-            apt-get install -y libc6-dev libssl-dev libc-ares-dev uthash-dev zlib1g-dev linux-libc-dev
+            apt-get install -y libc6-dev libssl-dev libc-ares-dev uthash-dev zlib1g-dev linux-libc-dev sqlite3 libsqlite3-dev
 
 #   create build environment
 WORKDIR     /tmp/build
@@ -34,12 +34,13 @@ RUN         cd cJSON-${VERSION_CJSON} && \
                 -DCMAKE_INSTALL_PREFIX="/app" \
                 -DCMAKE_C_FLAGS="-Wno-deprecated-declarations" \
                 -DBUILD_SHARED_LIBS=OFF \
+                -DENABLE_CJSON_TEST=OFF \
                 . && \
             make && \
             make install
 
 #   build libwebsockets
-ENV         VERSION_LIBWEBSOCKETS=4.5.2
+ENV         VERSION_LIBWEBSOCKETS=4.5.8
 RUN         curl -sSkL https://github.com/warmcat/libwebsockets/archive/v${VERSION_LIBWEBSOCKETS}.tar.gz | \
                 tar zxf -
 RUN         cd libwebsockets-${VERSION_LIBWEBSOCKETS} && \
@@ -67,7 +68,7 @@ RUN         cd libwebsockets-${VERSION_LIBWEBSOCKETS} && \
             make install
 
 #   build Mosquitto
-ENV         VERSION_MOSQUITTO=2.0.22
+ENV         VERSION_MOSQUITTO=2.1.2
 RUN         curl -sSkL https://mosquitto.org/files/source/mosquitto-${VERSION_MOSQUITTO}.tar.gz | \
                 tar zxf -
 COPY        mosquitto.patch .
@@ -76,19 +77,19 @@ RUN         cd mosquitto-${VERSION_MOSQUITTO} && \
             cmake \
                 -DCMAKE_BUILD_TYPE="Release" \
                 -DCMAKE_INSTALL_PREFIX="/app" \
-                -DCMAKE_C_FLAGS="-Wno-deprecated-declarations -I/app/include" \
-                -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations -I/app/include" \
+                -DCMAKE_C_FLAGS="-Wno-deprecated-declarations -I/app/include -I`pwd`/libcommon -I`pwd`/deps/picohttpparser" \
+                -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations -I/app/include -I`pwd`/libcommon -I`pwd`/deps/picohttpparser" \
                 -DCMAKE_EXE_LINKER_FLAGS="-L/app/lib" \
                 -DBUILD_SHARED_LIBS=OFF \
                 -DWITH_STATIC_LIBRARIES=ON \
                 -DSTATIC_WEBSOCKETS=ON \
+                -DWITH_TESTS=OFF \
                 -DWITH_PIC=ON \
-                -DWITH_ADNS=ON \
+                -DWITH_ADNS=OFF \
                 -DWITH_WEBSOCKETS=ON \
                 -DWITH_PLUGINS=ON \
                 -DWITH_TLS=ON \
                 -DWITH_TLS_PSK=ON \
-                -DWITH_EC=ON \
                 -DWITH_SRV=ON \
                 . && \
             make && \
@@ -104,13 +105,13 @@ RUN         git clone https://github.com/iegomez/mosquitto-go-auth && \
             cd mosquitto-go-auth && \
             git checkout -f "${VERSION_PLUGIN}"
 RUN         cd mosquitto-go-auth && \
-            env CGO_CFLAGS="-D_LARGEFILE64_SOURCE -fPIC -I`pwd`/../mosquitto-${VERSION_MOSQUITTO}/include" \
+            env CGO_CFLAGS="-D_LARGEFILE64_SOURCE -fPIC -I`pwd`/../mosquitto-${VERSION_MOSQUITTO}/include -I/app/include" \
                 CGO_LDFLAGS="-shared" \
                 go build -v -buildmode=c-archive go-auth.go && \
-            env CGO_CFLAGS="-D_LARGEFILE64_SOURCE -fPIC -I`pwd`/../mosquitto-${VERSION_MOSQUITTO}/include" \
+            env CGO_CFLAGS="-D_LARGEFILE64_SOURCE -fPIC -I`pwd`/../mosquitto-${VERSION_MOSQUITTO}/include -I/app/include" \
                 CGO_LDFLAGS="-shared" \
                 go build -v -buildmode=c-shared -o go-auth.so && \
-            env CGO_CFLAGS="-D_LARGEFILE64_SOURCE -fPIC -I`pwd`/../mosquitto-${VERSION_MOSQUITTO}/include" \
+            env CGO_CFLAGS="-D_LARGEFILE64_SOURCE -fPIC -I`pwd`/../mosquitto-${VERSION_MOSQUITTO}/include -I/app/include" \
                 CGO_LDFLAGS="" \
                 go build -o pw pw-gen/pw.go && \
             mkdir -p /app/libexec && \
@@ -120,7 +121,7 @@ RUN         cd mosquitto-go-auth && \
 #   ==== STAGE 2 ====
 
 #   derive image from a certain base image
-FROM        golang:1.25.6-trixie AS stage2
+FROM        golang:1.26.3-trixie AS stage2
 
 #   add additional build tools
 RUN         apt-get update && \
@@ -156,7 +157,7 @@ RUN         apt-get update && \
 
 #   extend Debian
 RUN         apt-get install -y --no-install-recommends bash curl gosu && \
-            apt-get install -y --no-install-recommends libc6 libssl3 libc-ares2
+            apt-get install -y --no-install-recommends libc6 libssl3 libc-ares2 libsqlite3-0
 
 #   establish application area and user/group
 RUN         groupadd -g 2000 app

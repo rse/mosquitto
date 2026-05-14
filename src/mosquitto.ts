@@ -30,14 +30,15 @@ export type MosquittoConfigListenEntry = {
     port:        number
 }
 export type MosquittoConfig = {
-    native:       boolean
-    container:    string
-    auth:         "builtin" | "plugin"
-    persistence:  boolean
-    acl:          string
-    passwd:       MosquittoConfigPasswdEntry[]
-    listen:       MosquittoConfigListenEntry[]
-    custom:       string
+    native:      boolean
+    debug:       boolean
+    container:   string
+    auth:        "builtin" | "plugin"
+    persistence: boolean
+    acl:         string
+    passwd:      MosquittoConfigPasswdEntry[]
+    listen:      MosquittoConfigListenEntry[]
+    custom:      string
 }
 
 /*  Mosquitto API class  */
@@ -53,7 +54,8 @@ export default class Mosquitto extends EventEmitter {
         super()
         this.config = {
             native:       false,
-            container:    "ghcr.io/rse/mosquitto:2.0.22-20260117",
+            debug:        false,
+            container:    "ghcr.io/rse/mosquitto:2.1.2-20260514",
             auth:         "builtin",
             acl:          "",
             persistence:  false,
@@ -104,17 +106,25 @@ export default class Mosquitto extends EventEmitter {
         const tmpdir = this.tmpdir!.path
 
         /*  generate Mosquitto configuration: standard prolog  */
-        let conf = textframe(`
-            #   logging
-            log_dest                stderr
+        let conf = ""
+        conf += textframe(`
+            #   logging level
             log_type                error
             log_type                warning
             log_type                notice
             log_type                information
-            log_type                subscribe
-            log_type                unsubscribe
-            log_type                websockets
-            log_type                debug
+        `)
+        if (this.config.debug)
+            conf += textframe(`
+                log_type                subscribe
+                log_type                unsubscribe
+                log_type                websockets
+                log_type                debug
+            `)
+        conf += textframe(`
+
+            #   logging facility
+            log_dest                stderr
             websockets_log_level    2
             connection_messages     true
             log_timestamp           true
@@ -123,25 +133,31 @@ export default class Mosquitto extends EventEmitter {
             #   internals
             sys_interval            1
             websockets_headers_size 2048
+            max_inflight_bytes      0
+            max_inflight_messages   0
         `)
 
         /*  generate Mosquitto configuration: authentication and authorization  */
         if (this.config.auth === "builtin") {
             conf += textframe(`
                 #   security (built-in)
-                acl_file         ./mosquitto-acl.txt
-                password_file    ./mosquitto-pwd.txt
-                allow_anonymous  true
+                #   NOTICE: do not add spaces between directives and arguments!
+                plugin /app/libexec/mosquitto_password_file.so
+                plugin_opt_password_file ./mosquitto-pwd.txt
+                plugin /app/libexec/mosquitto_acl_file.so
+                plugin_opt_acl_file ./mosquitto-acl.txt
+                allow_anonymous true
             `)
         }
         else if (this.config.auth === "plugin") {
             conf += textframe(`
                 #   security (plugin-based)
-                plugin                       /app/libexec/mosquitto-go-auth.so
-                auth_opt_backends            files
+                #   NOTICE: do not add spaces between directives and arguments!
+                plugin /app/libexec/mosquitto-go-auth.so
+                auth_opt_backends files
                 auth_opt_files_password_path ./mosquitto-pwd.txt
-                auth_opt_files_acl_path      ./mosquitto-acl.txt
-                auth_opt_allow_anonymous     true
+                auth_opt_files_acl_path ./mosquitto-acl.txt
+                auth_opt_allow_anonymous true
             `)
         }
         else
@@ -234,7 +250,7 @@ export default class Mosquitto extends EventEmitter {
 
         /*  generate Mosquitto password file  */
         const passwdFile = path.join(tmpdir, "mosquitto-pwd.txt")
-        await fs.promises.writeFile(passwdFile, "", { encoding: "utf8", mode: 0o600 })
+        await fs.promises.unlink(passwdFile).catch(() => {})
         for (let i = 0; i < this.config.passwd.length; i++) {
             const entry = this.config.passwd[i]
             if (this.config.native) {
