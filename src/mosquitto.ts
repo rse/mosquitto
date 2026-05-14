@@ -39,6 +39,7 @@ export type MosquittoConfig = {
     passwd:      MosquittoConfigPasswdEntry[]
     listen:      MosquittoConfigListenEntry[]
     custom:      string
+    customize:   (config: string) => string | Promise<string>
 }
 
 /*  Mosquitto API class  */
@@ -62,6 +63,7 @@ export default class Mosquitto extends EventEmitter {
             passwd:       [ { username: "example", password: "example" } ],
             listen:       [ { protocol: "mqtt", address: "127.0.0.1", port: 1883 } ],
             custom:       "",
+            customize:    (config: string) => config,
             ...config
         }
     }
@@ -219,6 +221,9 @@ export default class Mosquitto extends EventEmitter {
         const exposeOptions = []
         for (const entry of this.config.listen)
             exposeOptions.push("-p", `${entry.address}:${entry.port}:${entry.port}`)
+
+        /*  apply optional final configuration customization callback  */
+        conf = await this.config.customize(conf)
 
         /*  write Mosquitto configuration  */
         const confFile = path.join(tmpdir, "mosquitto.conf")
